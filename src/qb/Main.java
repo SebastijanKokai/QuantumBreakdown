@@ -99,7 +99,7 @@ public class Main {
 				flightList.add(flight);
 			}
 			
-			mapList.add(map);
+			// mapList.add(map);
 		}
 		
 		// Level 1 code
