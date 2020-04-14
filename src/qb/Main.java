@@ -114,7 +114,7 @@ public class Main {
 			map.y = (rad * 1 + h) * cosLat * sinLon;
 			map.z = (rad * 1 + h) * sinLat;	
 			
-			mapList.add(map);
+			// mapList.add(map);
 		}
 		
 		reader.close();
