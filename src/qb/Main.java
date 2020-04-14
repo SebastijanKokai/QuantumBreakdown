@@ -15,12 +15,16 @@ public class Main {
 
 	public static class Map {
 		int timestamp;
-		float latitude;
-		float longitude;
-		float altitude;
+		double latitude;
+		double longitude;
+		double altitude;
 		String start;
 		String destination;
 		int takeoff;
+		
+		double x;
+		double y;
+		double z;
 	}
 	
 	public static class Flight {
@@ -32,6 +36,7 @@ public class Main {
 		Set<Integer> set = new HashSet<Integer>();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static void order(ArrayList<Flight> flightList) {
 
 		Collections.sort(flightList, new Comparator() {
@@ -55,7 +60,7 @@ public class Main {
 
 	public static void main(String[] args) throws IOException {
 
-		File file = new File("/home/sebastijan/workspaces/eclipse-workspace/QuantumBreakdown/level2/level2_5.in");
+		File file = new File("/home/sebastijan/workspaces/eclipse-workspace/QuantumBreakdown/level3/level3_5.in");
 		Scanner reader = new Scanner(file);
 
 		ArrayList<Map> mapList = new ArrayList<Map>();
@@ -67,40 +72,52 @@ public class Main {
 			
 			String[] splitter = reader.nextLine().trim().split(",");
 			int z = 0;
-
-			Map map = new Map();
-			map.timestamp = Integer.parseInt(splitter[z++]);
-			map.latitude = Float.parseFloat(splitter[z++]);
-			map.longitude = Float.parseFloat(splitter[z++]);
-			map.altitude = Float.parseFloat(splitter[z++]);
 			
-			map.start = splitter[z++];
-			map.destination = splitter[z++];
-			map.takeoff = Integer.parseInt(splitter[z++]);
-			mapList.add(map);
-
-			boolean found = false;
-			for (int j = 0; j < flightList.size(); j++) {
-				if (map.start.equals(flightList.get(j).start)
-						&& map.destination.equals(flightList.get(j).destination)) {
-
-					flightList.get(j).set.add(map.takeoff);
-					found = true;
-				}
-			}
-
-			if (!found) {
-				Flight flight = new Flight();
-
-				flight.start = map.start;
-				flight.destination = map.destination;
-				flight.takeoff = map.takeoff;
-				flight.set.add(map.takeoff);
-				flightList.add(flight);
-			}
+			// Level 1 code
+			Map map = new Map();
+			// map.timestamp = Integer.parseInt(splitter[z++]);
+			map.latitude = Double.parseDouble(splitter[z++]);
+			map.longitude = Double.parseDouble(splitter[z++]);
+			map.altitude = Double.parseDouble(splitter[z++]);
+			
+			/*
+			 * map.start = splitter[z++]; map.destination = splitter[z++]; map.takeoff =
+			 * Integer.parseInt(splitter[z++]);
+			 */
+			
+			// Level 2 code
+			/*
+			 * boolean found = false; for (int j = 0; j < flightList.size(); j++) { if
+			 * (map.start.equals(flightList.get(j).start) &&
+			 * map.destination.equals(flightList.get(j).destination)) {
+			 * 
+			 * flightList.get(j).set.add(map.takeoff); found = true; } }
+			 * 
+			 * if (!found) { Flight flight = new Flight();
+			 * 
+			 * flight.start = map.start; flight.destination = map.destination;
+			 * flight.takeoff = map.takeoff; flight.set.add(map.takeoff);
+			 * flightList.add(flight); }
+			 */
+			
+			// Level 3 code
+			double cosLat = Math.cos(map.latitude * Math.PI / 180.0);
+			double sinLat = Math.sin(map.latitude * Math.PI / 180.0);
+			double cosLon = Math.cos(map.longitude * Math.PI / 180.0);
+			double sinLon = Math.sin(map.longitude * Math.PI / 180.0);
+			double rad = 6371 * 1000;
+			double f = 1.0 / 298.257224;
+			double C = 1.0 / Math.sqrt(cosLat * cosLat + (1 - f) * (1 - f) * sinLat * sinLat);
+			double S = (1.0 - f) * (1.0 - f) * C;
+			double h = map.altitude;
+			map.x = (rad * 1 + h) * cosLat * cosLon;
+			map.y = (rad * 1 + h) * cosLat * sinLon;
+			map.z = (rad * 1 + h) * sinLat;	
 			
 			mapList.add(map);
 		}
+		
+		reader.close();
 		
 		// Level 1 code
 		
@@ -141,19 +158,24 @@ public class Main {
 		 * + maxLongitude + "\n"; fileContent += maxAltitude;
 		 */
 		
-		order(flightList);
+		/* order(flightList); */
 		
 		String fileContent = "";
 		
-		for (int i = 0; i < flightList.size(); i++) {
-			fileContent += flightList.get(i).start + " " + flightList.get(i).destination + " "
-					+ flightList.get(i).set.size() + "\n";
+		/*
+		 * for (int i = 0; i < flightList.size(); i++) { fileContent +=
+		 * flightList.get(i).start + " " + flightList.get(i).destination + " " +
+		 * flightList.get(i).set.size() + "\n"; }
+		 */
+		
+		for (int i = 0; i < mapList.size(); i++) {
+			fileContent += mapList.get(i).x + " " + mapList.get(i).y + " " + mapList.get(i).z + "\n";
 		}
 		
 		
 		System.out.println(fileContent);
 
-		FileWriter fileWriter = new FileWriter("/home/sebastijan/workspaces/eclipse-workspace/QuantumBreakdown/level2/level2_2ex.out");
+		FileWriter fileWriter = new FileWriter("/home/sebastijan/workspaces/eclipse-workspace/QuantumBreakdown/level3/level3_exx.out");
 		fileWriter.write(fileContent);
 		fileWriter.close();
 
